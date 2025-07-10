@@ -1,14 +1,14 @@
 /* eslint-disable camelcase */
+import path from 'node:path';
 import { describe, it, expect, vi } from 'vitest';
 import { config } from '#spec/mocks/lib/contentUtils/config.js';
 import ContentUtils from '#src/lib/contentUtils/contentUtils.js';
 
+const toPosixPath = p => path.posix.normalize(p);
+
 vi.mock('#src/lib/contentUtils/config.js', async importOriginal => {
   const original = await importOriginal();
-  return {
-    ...original,
-    ...config,
-  };
+  return { ...original, ...config };
 });
 
 vi.mock('#src/lib/contentUtils/fileHandler.js', async importOriginal => {
@@ -26,7 +26,7 @@ describe('ContentUtils.prepareContent', async () => {
   const result = await ContentUtils.prepareContent();
 
   it('should output content to the correct path', () => {
-    expect(result.filePath).toEqual(config.outputPath);
+    expect(toPosixPath(result.filePath)).toEqual(toPosixPath(config.outputPath));
   });
 
   it('should output all content keys', () => {
@@ -78,7 +78,7 @@ describe('ContentUtils.prepareContent', async () => {
     });
 
     it('should output the correct collection ids', () => {
-      expect(collectionData.map(({ id }) => id).sort()).toEqual(
+      expect(collectionData.map(({ id }) => toPosixPath(id)).sort()).toEqual(
         [
           'web-development',
           'js',
@@ -86,7 +86,7 @@ describe('ContentUtils.prepareContent', async () => {
           'js/array-methods',
           'css',
           'collections',
-        ].sort()
+        ].map(toPosixPath).sort()
       );
     });
 
@@ -109,76 +109,79 @@ describe('ContentUtils.prepareContent', async () => {
       expect(
         collectionSnippetData.filter(
           ({ collectionId, snippetId }) =>
-            collectionId === 'web-development' &&
-            snippetId === 'articles/s/web-development-tips'
+            toPosixPath(collectionId) === 'web-development' &&
+            toPosixPath(snippetId) === 'articles/s/web-development-tips'
         ).length
       ).toEqual(1);
     });
 
     it('should output the correct collection snippet objects for language matchers', () => {
       const jsSnippets = collectionSnippetData.filter(
-        ({ collectionId }) => collectionId === 'js'
+        ({ collectionId }) => toPosixPath(collectionId) === 'js'
       );
       const cssSnippets = collectionSnippetData.filter(
-        ({ collectionId }) => collectionId === 'css'
+        ({ collectionId }) => toPosixPath(collectionId) === 'css'
       );
       expect(jsSnippets.length).toEqual(4);
       expect(cssSnippets.length).toEqual(2);
-      expect(jsSnippets.map(({ snippetId }) => snippetId).sort()).toEqual(
+      expect(jsSnippets.map(({ snippetId }) => toPosixPath(snippetId)).sort()).toEqual(
         [
           'js/s/array-grouping',
           'js/s/array-initialize',
           'js/s/array-map-foreach',
           'js/s/array-compare',
-        ].sort()
+        ].map(toPosixPath).sort()
       );
-      expect(cssSnippets.map(({ snippetId }) => snippetId).sort()).toEqual(
-        ['css/s/content-centering', 'css/s/css-reset'].sort()
+      expect(cssSnippets.map(({ snippetId }) => toPosixPath(snippetId)).sort()).toEqual(
+        ['css/s/content-centering', 'css/s/css-reset'].map(toPosixPath).sort()
       );
     });
 
     it('should output the correct collection snippet objects for language and tag matchers', () => {
       const jsArraySnippets = collectionSnippetData.filter(
-        ({ collectionId }) => collectionId === 'js/array'
+        ({ collectionId }) => toPosixPath(collectionId) === 'js/array'
       );
       expect(jsArraySnippets.length).toEqual(3);
-      expect(jsArraySnippets.map(({ snippetId }) => snippetId).sort()).toEqual(
+      expect(jsArraySnippets.map(({ snippetId }) => toPosixPath(snippetId)).sort()).toEqual(
         [
           'js/s/array-grouping',
           'js/s/array-initialize',
           'js/s/array-compare',
-        ].sort()
+        ].map(toPosixPath).sort()
       );
     });
 
     describe('should output the correct collection snippet objects for specific snippet ids', () => {
       const jsArrayMethodsSnippets = collectionSnippetData.filter(
-        ({ collectionId }) => collectionId === 'js/array-methods'
+        ({ collectionId }) => toPosixPath(collectionId) === 'js/array-methods'
       );
 
       it('should output the correct collection snippets', () => {
         expect(jsArrayMethodsSnippets.length).toEqual(3);
         expect(
-          jsArrayMethodsSnippets.map(({ snippetId }) => snippetId)
+          jsArrayMethodsSnippets.map(({ snippetId }) => toPosixPath(snippetId))
         ).toEqual([
           'js/s/array-map-foreach',
           'js/s/array-compare',
           'js/s/array-initialize',
-        ]);
+        ].map(toPosixPath));
       });
 
       it('should output the collection snippets in the right order', () => {
         expect(
-          jsArrayMethodsSnippets.find(({ position }) => position === 0)
-            .snippetId
+          toPosixPath(
+            jsArrayMethodsSnippets.find(({ position }) => position === 0).snippetId
+          )
         ).toBe('js/s/array-map-foreach');
         expect(
-          jsArrayMethodsSnippets.find(({ position }) => position === 1)
-            .snippetId
+          toPosixPath(
+            jsArrayMethodsSnippets.find(({ position }) => position === 1).snippetId
+          )
         ).toBe('js/s/array-compare');
         expect(
-          jsArrayMethodsSnippets.find(({ position }) => position === 2)
-            .snippetId
+          toPosixPath(
+            jsArrayMethodsSnippets.find(({ position }) => position === 2).snippetId
+          )
         ).toBe('js/s/array-initialize');
       });
     });
@@ -192,7 +195,7 @@ describe('ContentUtils.prepareContent', async () => {
     });
 
     it('should output the correct snippet ids', () => {
-      expect(snippetData.map(({ id }) => id).sort()).toEqual(
+      expect(snippetData.map(({ id }) => toPosixPath(id)).sort()).toEqual(
         [
           'articles/s/web-development-tips',
           'js/s/array-grouping',
@@ -201,11 +204,11 @@ describe('ContentUtils.prepareContent', async () => {
           'js/s/array-compare',
           'css/s/content-centering',
           'css/s/css-reset',
-        ].sort()
+        ].map(toPosixPath).sort()
       );
     });
 
-    it('should produce a ranking between 0 and 1 for all snippets', () => {
+it('should produce a ranking between 0 and 1 for all snippets', () => {
       snippetData.forEach(({ ranking }) => {
         expect(ranking).toBeGreaterThanOrEqual(0);
         expect(ranking).toBeLessThanOrEqual(1);
@@ -230,7 +233,7 @@ describe('ContentUtils.prepareContent', async () => {
       });
     });
 
-    it('should produce the correct listed attribute', () => {
+it('should produce the correct listed attribute', () => {
       const listedSnippets = snippetData.filter(({ listed }) => listed);
       const unlistedSnippets = snippetData.filter(({ listed }) => !listed);
       expect(listedSnippets.length).toEqual(6);
@@ -248,10 +251,10 @@ describe('ContentUtils.prepareContent', async () => {
     describe('Markdown parsing', () => {
       it('should highlight code blocks', () => {
         const snippetWithoutTitle = snippetData.find(
-          ({ id }) => id === 'js/s/array-grouping'
+          ({ id }) => toPosixPath(id) === 'js/s/array-grouping'
         );
         const snippetWithTitle = snippetData.find(
-          ({ id }) => id === 'articles/s/web-development-tips'
+          ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
         );
         expect(snippetWithoutTitle.content).toContain(
           'class="language-js notranslate" translate="no" data-code-language="JavaScript">'
@@ -265,10 +268,10 @@ describe('ContentUtils.prepareContent', async () => {
         const arrayFromReference =
           '<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from" data-code-reference="true" rel="noopener noreferrer" target="_blank"><code class="notranslate" translate="no">Array.from()</code></a>';
         const jsSnippet = snippetData.find(
-          ({ id }) => id === 'js/s/array-initialize'
+          ({ id }) => toPosixPath(id) === 'js/s/array-initialize'
         );
         const noJsSnippet = snippetData.find(
-          ({ id }) => id === 'articles/s/web-development-tips'
+          ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
         );
         expect(jsSnippet.content).toContain(arrayFromReference);
         expect(noJsSnippet.content).not.toContain(arrayFromReference);
@@ -276,10 +279,10 @@ describe('ContentUtils.prepareContent', async () => {
 
       it('should safeguard only external links', () => {
         const externalLinkSnippet = snippetData.find(
-          ({ id }) => id === 'articles/s/web-development-tips'
+          ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
         );
         const internalLinkSnippet = snippetData.find(
-          ({ id }) => id === 'js/s/array-map-foreach'
+          ({ id }) => toPosixPath(id) === 'js/s/array-map-foreach'
         );
         expect(externalLinkSnippet.content).toContain(
           '<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder" rel="noopener noreferrer" target="_blank">modulo operator(<code class="notranslate" translate="no">%</code>)</a>'
@@ -291,7 +294,7 @@ describe('ContentUtils.prepareContent', async () => {
 
       it('should transform headings', () => {
         const snippetWithHeadings = snippetData.find(
-          ({ id }) => id === 'articles/s/web-development-tips'
+          ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
         );
         expect(snippetWithHeadings.content).toContain(
           '<h2><a href="#this-is-a-level-2-heading-with-some-code" id="this-is-a-level-2-heading-with-some-code">This is a level 2 heading with <code class="notranslate" translate="no">some code</code></a></h2>'
@@ -300,7 +303,7 @@ describe('ContentUtils.prepareContent', async () => {
 
       it('should transform image paths', () => {
         const snippetWithImages = snippetData.find(
-          ({ id }) => id === 'articles/s/web-development-tips'
+          ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
         );
         expect(snippetWithImages.content).toContain(
           '<img src="/assets/illustrations/flexbox-diagram.svg" alt="Diagram of Flexbox properties">'
@@ -309,7 +312,7 @@ describe('ContentUtils.prepareContent', async () => {
 
       it('should wrap tables', () => {
         const snippetWithTables = snippetData.find(
-          ({ id }) => id === 'articles/s/web-development-tips'
+          ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
         );
         expect(snippetWithTables.content).toContain(
           '<figure class="table-wrapper"><table>'
@@ -318,7 +321,7 @@ describe('ContentUtils.prepareContent', async () => {
 
       it('should embed codepens from links', () => {
         const snippetWithTables = snippetData.find(
-          ({ id }) => id === 'css/s/content-centering'
+          ({ id }) => toPosixPath(id) === 'css/s/content-centering'
         );
         expect(snippetWithTables.content).toContain('<p class="codepen"');
         expect(snippetWithTables.content).toContain(
@@ -331,7 +334,7 @@ describe('ContentUtils.prepareContent', async () => {
 
       it('should transform admonitions', () => {
         const snippetWithAdmonitions = snippetData.find(
-          ({ id }) => id === 'articles/s/web-development-tips'
+          ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
         );
         expect(snippetWithAdmonitions.content).toContain(
           '<figcaption>💡  Tip</figcaption>'
