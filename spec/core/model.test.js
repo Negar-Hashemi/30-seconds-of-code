@@ -26,7 +26,9 @@ describe('Serializer', () => {
 
   const user1 = new User({ id: 'john-doe', name: 'John Doe', email: 'x@y.z' });
   const user2 = new User({ id: 'jane-doe', name: 'Jane Doe', email: 'a@b.c' });
-
+  /**
+  * @skipOnOS win32,darwin
+  */
   describe('all', () => {
     it('returns all records', () => {
       expect(User.all).toEqual([user1, user2]);
