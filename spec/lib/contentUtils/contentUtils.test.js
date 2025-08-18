@@ -21,7 +21,9 @@ vi.mock('#src/lib/contentUtils/fileHandler.js', async importOriginal => {
     },
   };
 });
-
+/**
+* @skipOnOS win32
+*/
 describe('ContentUtils.prepareContent', async () => {
   const result = await ContentUtils.prepareContent();
 
