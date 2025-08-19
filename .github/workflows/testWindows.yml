@@ -25,7 +25,7 @@ jobs:
             **/package-lock.json
 
       - name: Install
-        run: npm ci
+        run: npm install
 
       # If you didn’t add "postinstall" in package.json, run setup explicitly:
       - name: Run js-sanitizer setup
