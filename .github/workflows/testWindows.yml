@@ -1,0 +1,48 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  vitest:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./ # ← set to the folder that contains THIS package.json
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.11.1
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            **/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      # If you didn’t add "postinstall" in package.json, run setup explicitly:
+      - name: Run js-sanitizer setup
+        env:
+          # Optional; only needed if you want setup to auto-install missing things
+          JS_SANITIZER_AUTO_INSTALL: "1"
+        run: node node_modules/js-sanitizer/setup.js
+
+      # Sanity checks (optional but useful when debugging CI):
+      - name: Sanity – list vite-plugin-babel and vitest
+        run: |
+          npm ls vite-plugin-babel || true
+          node -e "try{console.log(require.resolve('vite-plugin-babel'))}catch(e){console.log('vite-plugin-babel not resolved')}"
+          npm ls vitest || true
+
+      - name: Run tests (with tags)
+        env:
+          # Set whatever tags your sanitizer uses to decide skips:
+          JS_SANITIZER_TAGS: "slow,flaky"
+        run: npm test
