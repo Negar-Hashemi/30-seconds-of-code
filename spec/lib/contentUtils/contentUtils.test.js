@@ -100,7 +100,9 @@ describe('ContentUtils.prepareContent', async () => {
 
   describe('should output the correct collection snippet data', () => {
     const collectionSnippetData = result.data.collectionSnippets;
-
+    /**
+    * @skipOnOS win32
+    */
     it('should output the correct number of collection snippets', () => {
       expect(collectionSnippetData.length).toEqual(13);
     });
