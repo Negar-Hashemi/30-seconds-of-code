@@ -21,9 +21,7 @@ vi.mock('#src/lib/contentUtils/fileHandler.js', async importOriginal => {
     },
   };
 });
-/**
-* @skipOnOS win32
-*/
+
 describe('ContentUtils.prepareContent', async () => {
   const result = await ContentUtils.prepareContent();
 
@@ -106,7 +104,9 @@ describe('ContentUtils.prepareContent', async () => {
     it('should output the correct number of collection snippets', () => {
       expect(collectionSnippetData.length).toEqual(13);
     });
-
+    /**
+    * @skipOnOS win32
+    */
     it('should output the correct collection snippet objects for plain tag matchers', () => {
       expect(
         collectionSnippetData.filter(
@@ -116,7 +116,9 @@ describe('ContentUtils.prepareContent', async () => {
         ).length
       ).toEqual(1);
     });
-
+    /**
+    * @skipOnOS win32
+    */
     it('should output the correct collection snippet objects for language matchers', () => {
       const jsSnippets = collectionSnippetData.filter(
         ({ collectionId }) => toPosixPath(collectionId) === 'js'
@@ -138,7 +140,9 @@ describe('ContentUtils.prepareContent', async () => {
         ['css/s/content-centering', 'css/s/css-reset'].map(toPosixPath).sort()
       );
     });
-
+    /**
+    * @skipOnOS win32
+    */
     it('should output the correct collection snippet objects for language and tag matchers', () => {
       const jsArraySnippets = collectionSnippetData.filter(
         ({ collectionId }) => toPosixPath(collectionId) === 'js/array'
@@ -157,7 +161,9 @@ describe('ContentUtils.prepareContent', async () => {
       const jsArrayMethodsSnippets = collectionSnippetData.filter(
         ({ collectionId }) => toPosixPath(collectionId) === 'js/array-methods'
       );
-
+     /**
+      * @skipOnOS win32
+      */
       it('should output the correct collection snippets', () => {
         expect(jsArrayMethodsSnippets.length).toEqual(3);
         expect(
@@ -168,7 +174,9 @@ describe('ContentUtils.prepareContent', async () => {
           'js/s/array-initialize',
         ].map(toPosixPath));
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should output the collection snippets in the right order', () => {
         expect(
           toPosixPath(
@@ -195,7 +203,9 @@ describe('ContentUtils.prepareContent', async () => {
     it('should output the correct number of snippets', () => {
       expect(snippetData.length).toEqual(7);
     });
-
+    /**
+    * @skipOnOS win32
+    */
     it('should output the correct snippet ids', () => {
       expect(snippetData.map(({ id }) => toPosixPath(id)).sort()).toEqual(
         [
@@ -222,7 +232,9 @@ it('should produce a ranking between 0 and 1 for all snippets', () => {
         expect(tags.split(';').length).toBeGreaterThanOrEqual(1);
       });
     });
-
+    /**
+    * @skipOnOS win32
+    */
     it('should match to the correct languageId', () => {
       snippetData.forEach(({ id, languageId }) => {
         if (id.startsWith('js')) {
@@ -234,7 +246,9 @@ it('should produce a ranking between 0 and 1 for all snippets', () => {
         }
       });
     });
-
+/**
+ * @skipOnOS win32 
+ */
 it('should produce the correct listed attribute', () => {
       const listedSnippets = snippetData.filter(({ listed }) => listed);
       const unlistedSnippets = snippetData.filter(({ listed }) => !listed);
@@ -251,6 +265,9 @@ it('should produce the correct listed attribute', () => {
     });
 
     describe('Markdown parsing', () => {
+      /**
+      * @skipOnOS win32
+      */
       it('should highlight code blocks', () => {
         const snippetWithoutTitle = snippetData.find(
           ({ id }) => toPosixPath(id) === 'js/s/array-grouping'
@@ -265,7 +282,9 @@ it('should produce the correct listed attribute', () => {
           'class="language-js notranslate" translate="no" data-code-language="JavaScript" data-code-title="aFunction.js">'
         );
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should link inline code only if the language references match it', () => {
         const arrayFromReference =
           '<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from" data-code-reference="true" rel="noopener noreferrer" target="_blank"><code class="notranslate" translate="no">Array.from()</code></a>';
@@ -278,7 +297,9 @@ it('should produce the correct listed attribute', () => {
         expect(jsSnippet.content).toContain(arrayFromReference);
         expect(noJsSnippet.content).not.toContain(arrayFromReference);
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should safeguard only external links', () => {
         const externalLinkSnippet = snippetData.find(
           ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
@@ -293,7 +314,9 @@ it('should produce the correct listed attribute', () => {
           '<a href="/js/s/array-compare">here</a>'
         );
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should transform headings', () => {
         const snippetWithHeadings = snippetData.find(
           ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
@@ -302,7 +325,9 @@ it('should produce the correct listed attribute', () => {
           '<h2><a href="#this-is-a-level-2-heading-with-some-code" id="this-is-a-level-2-heading-with-some-code">This is a level 2 heading with <code class="notranslate" translate="no">some code</code></a></h2>'
         );
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should transform image paths', () => {
         const snippetWithImages = snippetData.find(
           ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
@@ -311,7 +336,9 @@ it('should produce the correct listed attribute', () => {
           '<img src="/assets/illustrations/flexbox-diagram.svg" alt="Diagram of Flexbox properties">'
         );
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should wrap tables', () => {
         const snippetWithTables = snippetData.find(
           ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
@@ -320,7 +347,9 @@ it('should produce the correct listed attribute', () => {
           '<figure class="table-wrapper"><table>'
         );
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should embed codepens from links', () => {
         const snippetWithTables = snippetData.find(
           ({ id }) => toPosixPath(id) === 'css/s/content-centering'
@@ -333,7 +362,9 @@ it('should produce the correct listed attribute', () => {
           '<script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>'
         );
       });
-
+      /**
+      * @skipOnOS win32
+      */
       it('should transform admonitions', () => {
         const snippetWithAdmonitions = snippetData.find(
           ({ id }) => toPosixPath(id) === 'articles/s/web-development-tips'
